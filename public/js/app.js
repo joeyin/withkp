@@ -18,10 +18,10 @@
 	}
 
 	$(window).resize(function(){
+		page_postion = [];
 		$(".page").css({
 			'height': $(window).height()
 		}).each(function(){
-			page_postion = [];
 			page_postion.push($(this).offset());
 		});
 	});
@@ -31,10 +31,10 @@
 		if(!supports_html5_storage()){
 			alert('您的瀏覽器無法正常使用此服務，請更換瀏覽器或將瀏覽器升級。');
 		};
+		page_postion = [];
 		$(".page").css({
 			'height': $(window).height()
 		}).each(function(){
-			page_postion = [];
 			page_postion.push($(this).offset());
 		});
 		$(".zuImage").zuImage({

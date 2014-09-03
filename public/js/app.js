@@ -21,7 +21,7 @@
 		$(".page").css({
 			'height': $(window).height()
 		}).each(function(){
-			page_postion = null;
+			page_postion = [];
 			page_postion.push($(this).offset());
 		});
 	});
@@ -34,7 +34,7 @@
 		$(".page").css({
 			'height': $(window).height()
 		}).each(function(){
-			page_postion = null;
+			page_postion = [];
 			page_postion.push($(this).offset());
 		});
 		$(".zuImage").zuImage({

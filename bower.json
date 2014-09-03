@@ -1,0 +1,20 @@
+{
+  "name": "withkp",
+  "version": "0.0.1",
+  "homepage": "https://github.com/joeyin/withkp",
+  "authors": [
+    "joe <s60621s60621@gmail.com>"
+  ],
+  "description": "withkp",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "html2canvas": "~0.4.1"
+  }
+}

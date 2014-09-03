@@ -1,0 +1,284 @@
+.f_l {
+	float: left;
+}
+
+.f_r {
+	float: right;
+}
+
+.hidden {
+	display: none;
+}
+
+.zuImage {
+	background: #FFFFFF;
+	/*-webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+	border-radius: 8px;*/
+	overflow: hidden;
+	border: 1px solid #c8c7c5;
+	margin: 0 auto;
+	position: relative;
+}
+
+.zu-table {
+	display: table;
+	width: 100%;
+	height: 46px;
+	background: url(../images/opacity.png);
+	float: left;
+	padding: 2px 17px 2px 17px;
+}
+
+.zu-tool, .zu-progresstext {
+	display: table-cell;
+}
+
+.zu-progresstext ul, .zu-tool ul {
+	list-style: none;
+	margin: 0 auto;
+	padding: 0;
+}
+
+.zu-progresstext ul {
+	width: 655px;
+}
+
+.zu-progresstext ul li {
+	float: left;
+	padding: 0px;
+	margin-right: 25px;
+	border-bottom: 2px solid transparent;
+	padding-right: 25px;
+	background: url(../images/step_next.png) no-repeat right 8px;
+}
+
+.zu-progresstext ul li:last-child {
+	background: none;
+	margin-right: 0px;
+}
+
+.step1, .step2, .step3, .step4 {
+	width: 120px;
+	height: 24px;
+	cursor: pointer;
+}
+
+.step1 {
+	background: url(../images/text.png) no-repeat -2px 2px;
+}
+
+.step1.current {
+	background: url(../images/text.png) no-repeat -141px 2px;
+}
+
+.step2 {
+	background: url(../images/text.png) no-repeat -2px -22px;
+}
+
+.step2.current {
+	background: url(../images/text.png) no-repeat -141px -22px;
+}
+
+.step3 {
+	background: url(../images/text.png) no-repeat -3px -46px;
+}
+
+.step3.current {
+	background: url(../images/text.png) no-repeat -142px -46px;
+}
+
+.step4 {
+	background: url(../images/text.png) no-repeat -3px -70px;
+}
+
+.step4.current {
+	background: url(../images/text.png) no-repeat -142px -70px;
+}
+
+.zu-tool ul {
+	width: 110px;
+}
+
+.zu-tool ul li {
+	float: left;
+	margin-right: 25px;
+	padding-top: 12px;
+}
+
+.tool1, .tool2 {
+	width: 26px;
+	height: 22px;
+	cursor: pointer;
+}
+
+.tool1 {
+	background: url(../images/text.png) no-repeat -99px -102px;
+}
+
+.tool1:hover {
+	background: url(../images/text.png) no-repeat -141px -102px;
+}
+
+.tool2 {
+	background: url(../images/text.png) no-repeat -96px -127px;
+}
+
+.tool2:hover {
+	background: url(../images/text.png) no-repeat -138px -127px;
+}
+
+.zu_prompt1 {
+	position: absolute; 
+	width: 100%; 
+	height: 100%;
+	cursor: pointer;
+	z-index: 98;
+}
+
+.zu_prompt_middle {
+	position: absolute; 
+	width: 100%; 
+	height: 236px;
+    top: 0; 
+    bottom: 0; 
+    left: 0; 
+    right: 0; 
+    margin: auto;
+}
+
+.zu_step1_prompt_text {
+	background: url(../images/text.png) no-repeat -270px -1px;
+	width: 630px;
+	height: 100px;
+	margin: 0px auto 38px auto;
+}
+
+.zu_step1_prompt_img {
+	background: url(../images/text.png) no-repeat -910px -1px;
+	width: 63px;
+	height: 100px;
+	margin: 0 auto;
+}
+
+.abs_2 {
+	position: absolute;
+	z-index: 99;
+}
+
+.zu_workspace {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	z-index: 9;
+}
+
+.zu_step1_workspace_img {
+	width: 100%;
+	height: 100%;
+}
+
+.zu-select-photo {
+	width: 100%;
+	height: 100px;
+	position: absolute;
+	padding: 2px 17px 2px 17px;
+	top: -100px;
+	background: url(../images/opacity.png);
+	z-index: 98;
+}
+
+.zu-table-row {
+	display: table-row;
+}
+
+.zu-select-photo ul {
+	overflow: auto;
+	margin: 0;
+	padding: 0;
+	overflow-x: scroll;
+    white-space: nowrap;
+    height: 100%;
+}
+
+.zu-select-photo ul li {
+	-webkit-border-radius: 40px;
+	-moz-border-radius: 40px;
+	border-radius: 40px;
+	border: 2px solid #CCCCCC;
+	overflow: hidden;
+	width: 80px;
+	height: 80px;
+	margin-right: 10px;
+	display: inline-block;
+	cursor: pointer;
+}
+
+.zu-select-photo ul li.selected {
+	border: 2px solid #44C039;
+}
+
+.zu-select-photo ul li:last-child {
+	margin-right: 0px;
+}
+
+.zu-select-photo ul li:hover{
+	border: 2px solid #44C039;
+}
+
+.zu_roles {
+	position: absolute;
+	z-index: 102;
+	top: 0px;
+	height: 100%;
+}
+
+.glyphicon {
+	font-size: 16px;
+	cursor: pointer;
+}
+
+.zu-light {
+	width: 100%;
+	position: absolute;
+	background: #FFFFFF;
+	z-index: 9999;
+	top: 0px;
+	display: none;
+}
+
+.zu-end_opacity {
+	background: url(../images/opacity.png);
+	width: 100%;
+	height: 100%;
+	z-index: 98;
+	position: absolute;
+}
+
+.zu-end {
+	width: 170px;
+	height: 60px;
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	margin: auto;
+	z-index: 99;
+	list-style: none;
+	padding: 0;
+}
+
+.zu-end li {
+	float: left;
+	margin-right: 50px;
+}
+
+.zu-end li:last-child {
+	margin-right: 0px;
+}
+
+.s58 {
+	font-size: 58px;
+	color: #50754D;
+}

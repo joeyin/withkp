@@ -12,13 +12,16 @@
 
 .zuImage {
 	background: #FFFFFF;
-	/*-webkit-border-radius: 8px;
+	-webkit-border-radius: 8px;
 	-moz-border-radius: 8px;
-	border-radius: 8px;*/
+	border-radius: 8px;
 	overflow: hidden;
 	border: 1px solid #c8c7c5;
 	margin: 0 auto;
 	position: relative;
+	-webkit-box-shadow: 0px 3px 0px -1px #A3A3A3;
+	-moz-box-shadow: 0px 3px 0px -1px #A3A3A3;
+	box-shadow: 0px 3px 0px -1px #A3A3A3;
 }
 
 .zu-table {
@@ -65,45 +68,50 @@
 }
 
 .step1 {
-	background: url(../images/text.png) no-repeat -2px 2px;
+	background: url(../images/text.png) no-repeat -2px 0px;
 }
 
 .step1.current {
-	background: url(../images/text.png) no-repeat -141px 2px;
+	background: url(../images/text.png) no-repeat -141px 0px;
 }
 
 .step2 {
-	background: url(../images/text.png) no-repeat -2px -22px;
+	background: url(../images/text.png) no-repeat -2px -24px;
 }
 
 .step2.current {
-	background: url(../images/text.png) no-repeat -141px -22px;
+	background: url(../images/text.png) no-repeat -141px -24px;
 }
 
 .step3 {
-	background: url(../images/text.png) no-repeat -3px -46px;
+	background: url(../images/text.png) no-repeat -3px -49px;
 }
 
 .step3.current {
-	background: url(../images/text.png) no-repeat -142px -46px;
+	background: url(../images/text.png) no-repeat -142px -49px;
 }
 
 .step4 {
-	background: url(../images/text.png) no-repeat -3px -70px;
+	background: url(../images/text.png) no-repeat -3px -72px;
 }
 
 .step4.current {
-	background: url(../images/text.png) no-repeat -142px -70px;
+	background: url(../images/text.png) no-repeat -142px -72px;
 }
 
 .zu-tool ul {
 	width: 110px;
+	float: left;
 }
 
 .zu-tool ul li {
 	float: left;
 	margin-right: 25px;
 	padding-top: 12px;
+}
+
+.zu-tool ul li:last-child {
+	margin-right: 0px;
 }
 
 .tool1, .tool2 {
@@ -234,7 +242,6 @@
 }
 
 .glyphicon {
-	font-size: 16px;
 	cursor: pointer;
 }
 
@@ -278,7 +285,39 @@
 	margin-right: 0px;
 }
 
+.s20 {
+	font-size: 20px;
+}
+
 .s58 {
 	font-size: 58px;
 	color: #50754D;
+}
+
+@media only screen and (min-device-width: 320px) and (max-width: 800px){
+	.zu-progresstext ul li{
+		margin-right: 10px;
+	}
+
+	.zu-tool ul {
+		width: 75px;
+	}
+
+	.zu-tool ul li{
+		margin-right: 20px;
+	}
+}
+
+@media only screen and (max-width: 800px) {
+	.abs_2 {
+		width: 100%;
+	}
+
+	.zu_prompt1 {
+		display: none;
+	}
+	
+	.zu-progresstext {
+		display: none;
+	}
 }

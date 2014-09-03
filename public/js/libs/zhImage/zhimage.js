@@ -44,7 +44,7 @@
 	    		'width': obj.width,
 	    		'maxWidth': obj.maxwidth,
 	    		'height': obj.height,
-	    	}).html('<input name="upload_img" class="hidden" type="file" /><div class="zu_prompt1"><div class="zu_prompt_middle"><div class="zu_step1_prompt_text"></div><div class="zu_step1_prompt_img"></div></div></div><div class="zu_workspace"><div class="zu_step1_workspace_block"></div><div class="zu_step1_workspace_img"></div><div class="zu_roles"></div></div><div class="abs_2"><div class="zu-table"><div class="zu-table-row"><div class="zu-tool"><ul><li><span class="glyphicon glyphicon-camera gray"></span></li><li><span class="glyphicon glyphicon-picture green"></span></li></ul></div><div class="zu-progresstext"><ul><li><div class="step1"></div></li><li><div class="step2"></div></li><li><div class="step3"></div></li><li><div class="step4"></div></li></ul></div></div></div><div class="zu-select-photo"><ul></ul></div></div>');
+	    	}).html('<input name="upload_img" class="hidden" type="file" /><div class="zu_prompt1"><div class="zu_prompt_middle"><div class="zu_step1_prompt_text"></div><div class="zu_step1_prompt_img"></div></div></div><div class="zu_workspace"><div class="zu_step1_workspace_block"></div><div class="zu_step1_workspace_img"></div><div class="zu_roles"></div></div><div class="abs_2"><div class="zu-table"><div class="zu-table-row"><div class="zu-tool"><ul><li><span class="glyphicon glyphicon-camera gray s20"></span></li><li><span class="glyphicon glyphicon-picture green s20"></span></li></ul></div><div class="zu-progresstext"><ul><li><div class="step1"></div></li><li><div class="step2"></div></li><li><div class="step3"></div></li><li><div class="step4"></div></li></ul></div></div></div><div class="zu-select-photo"><ul></ul></div></div>');
 			$.each(obj.photo, function( index, value ) {
 				$(".zu-select-photo ul").append('<li><img width="100%" src="'+value+'" /></li>');
 			});
@@ -81,9 +81,10 @@
 		            	$(this).hide().css('opacity', '100');
 		            	html2canvas($(".zu_workspace"), {
 							onrendered: function(canvas) {
+						    	$(".menu li a:eq(1)").click();
 						    	$(".zuImage").empty().html('<div class="zu-end_opacity"></div><ul class="zu-end"><li><span class="glyphicon glyphicon-download-alt s58"></span></li><li><span class="glyphicon glyphicon-repeat s58"></span></li></ul><img src="'+canvas.toDataURL('image/jpeg')+'" />');
 						    	$(".zu-end li:eq(0)").click(function(){
-						    		var download = $("<a>").attr("href", canvas.toDataURL('image/jpeg')).attr("download", "withkp.jpg").appendTo("body");
+						    		var download = $("<a>").attr({'target': '_blank', 'href': canvas.toDataURL('image/jpeg'),'download': 'withkp.jpg'}).appendTo("body");
 							    	download[0].click();
 							    	download.remove();
 						    	});

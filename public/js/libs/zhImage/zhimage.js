@@ -4,13 +4,14 @@
 	    	var stepNum,
 	    		select_photo,
 	    		progressUpdate = function(num) {
+	    			var takephoto = $(".zu-tool ul li:eq(0) span");
 	    			if(num === 1 ){
 	    				updateStyle.progress(1);
 			           	$(".zu-select-photo").animate({
 							'top': 46
 			           	}, 600);
 			           	progressUpdate(2);
-			           	$(".zu-tool ul li:eq(0) span").removeClass('green');
+			           	takephoto.removeClass('current_light');
 	    			}else if(num === 2){
 	    				updateStyle.progress(1);
 	    				$(".zu-select-photo ul li").click(function(){
@@ -21,14 +22,14 @@
 				            	progressUpdate(3);
 				            });
 			           	});
-			           	$(".zu-tool ul li:eq(0) span").removeClass('green');
+			           	takephoto.removeClass('current_light');
 					}else if(num === 3 ){
 						updateStyle.progress(2);
 						$(".zu_roles").html('<img height="100%" src="'+$('.zu-select-photo ul li:eq('+select_photo+')').css('backgroundImage').replace('url(','').replace(')','')+'" />').draggable();
-						$(".zu-tool ul li:eq(0) span").addClass('green');
+						takephoto.addClass('current_light');
 					}else{
 						updateStyle.progress(0);
-						$(".zu-tool ul li:eq(0) span").removeClass('green');
+						takephoto.removeClass('current_light');
 					}
 	    		},
 	    		updateStyle = {

@@ -296,6 +296,24 @@
 	color: #50754D;
 }
 
+.current_light {
+	animation: shiny 5s;
+  	-moz-animation: shiny 5s infinite;
+	-webkit-animation: shiny 5s infinite;
+}
+
+@-moz-keyframes shiny {
+	20%  {color: #FFFFFF;}
+	60%   {color: #44C039;}
+	100% {color: #44C039;}
+}
+ 
+@-webkit-keyframes shiny {
+	60%  {color: #FFFFFF;}
+	20%   {color: #44C039;}
+	100% {color: #44C039;}
+}
+
 @media only screen and (min-device-width: 320px) and (max-width: 800px){
 	.zu-progresstext ul li{
 		margin-right: 10px;

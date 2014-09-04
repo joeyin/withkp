@@ -339,3 +339,8 @@
 		display: none;
 	}
 }
+
+.ui-resizable-handle {
+    border: 1px dotted #FFFFFF;
+    opacity: 0.6;
+}

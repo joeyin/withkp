@@ -26,7 +26,8 @@
 					}else if(num === 3 ){
 						updateStyle.progress(2);
 						var image_src = $('.zu-select-photo ul li:eq('+select_photo+')').css('backgroundImage').replace('url(','').replace(')','').replace('"','');
-						$(".zu_roles").html('<img src="'+image_src+'" />').draggable();
+						$(".zu_roles").html('<img width="80%" src="'+image_src+'" />').draggable({'cursor': 'move', 'scroll': false });
+						$(".zu_roles img").resizable();
 						takephoto.addClass('current_light');
 					}else{
 						updateStyle.progress(0);

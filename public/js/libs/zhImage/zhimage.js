@@ -24,7 +24,7 @@
 			           	$(".zu-tool ul li:eq(0) span").removeClass('green');
 					}else if(num === 3 ){
 						updateStyle.progress(2);
-						$(".zu_roles").html('<img height="100%" src="'+$('.zu-select-photo ul li:eq('+select_photo+') img').attr('src')+'" />').draggable();
+						$(".zu_roles").html('<img height="100%" src="'+$('.zu-select-photo ul li:eq('+select_photo+')').css('backgroundImage').replace('url(','').replace(')','')+'" />').draggable();
 						$(".zu-tool ul li:eq(0) span").addClass('green');
 					}else{
 						updateStyle.progress(0);
@@ -46,7 +46,7 @@
 	    		'height': obj.height,
 	    	}).html('<input name="upload_img" class="hidden" type="file" /><div class="zu_prompt1"><div class="zu_prompt_middle"><div class="zu_step1_prompt_text"></div><div class="zu_step1_prompt_img"></div></div></div><div class="zu_workspace"><div class="zu_step1_workspace_block"></div><div class="zu_step1_workspace_img"></div><div class="zu_roles"></div></div><div class="abs_2"><div class="zu-table"><div class="zu-table-row"><div class="zu-tool"><ul><li><span class="glyphicon glyphicon-camera gray s20"></span></li><li><span class="glyphicon glyphicon-picture green s20"></span></li></ul></div><div class="zu-progresstext"><ul><li><div class="step1"></div></li><li><div class="step2"></div></li><li><div class="step3"></div></li><li><div class="step4"></div></li></ul></div></div></div><div class="zu-select-photo"><ul></ul></div></div>');
 			$.each(obj.photo, function( index, value ) {
-				$(".zu-select-photo ul").append('<li><img width="100%" src="'+value+'" /></li>');
+				$(".zu-select-photo ul").append('<li style="background:url('+value+') bottom center no-repeat;background-size:100%;"></li>');
 			});
 	    	
 	    	//progress init

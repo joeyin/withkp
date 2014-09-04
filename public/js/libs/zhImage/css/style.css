@@ -239,6 +239,7 @@
 	z-index: 102;
 	top: 0px;
 	height: 100%;
+	cursor: move;
 }
 
 .glyphicon {

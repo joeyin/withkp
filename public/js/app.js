@@ -41,7 +41,7 @@
 			'width': '100%',
 			'maxwidth': '800px',
 			'height': '568px',
-			'photo': ['public/images/keyer_effects/kp1.png']
+			'photo': ['public/images/keyer_effects/kp1.png', 'public/images/keyer_effects/kp2.png', 'public/images/keyer_effects/kp3.png']
 		});
 		$(".logo_medium").click(function(){
 			goPage(0);

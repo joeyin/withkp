@@ -75,7 +75,7 @@
 			    reader.readAsDataURL(file);
 	    	});
 
-	    	$(".zu-tool ul li:eq(0)").click(function(){
+	    	$(".zu-tool ul li:eq(0), .step4").click(function(){
 	    		if(stepNum === 2){
 	    			$(".ui-resizable-handle").hide();
 	    			updateStyle.progress(3);

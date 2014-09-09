@@ -52,6 +52,7 @@ window.html2canvas = function(nodeList, options) {
 
     var node = ((nodeList === undefined) ? [document.documentElement] : ((nodeList.length) ? nodeList : [nodeList]))[0];
     node.setAttribute(html2canvasNodeAttribute, "true");
+
     return renderDocument(node.ownerDocument, options, window.innerWidth, window.innerHeight).then(function(canvas) {
         if (typeof(options.onrendered) === "function") {
             log("options.onrendered is deprecated, html2canvas returns a Promise containing the canvas");
@@ -77,10 +78,12 @@ function renderDocument(document, options, windowWidth, windowHeight) {
         var parser = new NodeParser(node, renderer, support, imageLoader, options);
         return parser.ready.then(function() {
             log("Finished rendering");
+            var canvas = (options.type !== "view" && (node === clonedWindow.document.body || node === clonedWindow.document.documentElement)) ? renderer.canvas : crop(renderer.canvas, bounds);
             if (options.removeContainer) {
                 container.parentNode.removeChild(container);
+                log("Cleaned up container");
             }
-            return (options.type !== "view" && (node === clonedWindow.document.body || node === clonedWindow.document.documentElement)) ? renderer.canvas : crop(renderer.canvas, bounds);
+            return canvas;
         });
     });
 }
@@ -295,6 +298,7 @@ function ImageLoader(options, support) {
 ImageLoader.prototype.findImages = function(nodes) {
     var images = [];
     nodes.filter(isImage).map(urlImage).forEach(this.addImage(images, this.loadImage), this);
+    nodes.filter(isSVGNode).map(svgImage).forEach(this.addImage(images, this.loadImage), this);
     return images;
 };
 
@@ -305,10 +309,12 @@ ImageLoader.prototype.findBackgroundImage = function(images, container) {
 
 ImageLoader.prototype.addImage = function(images, callback) {
     return function(newImage) {
-        if (!this.imageExists(images, newImage)) {
-            images.splice(0, 0, callback.apply(this, arguments));
-            log('Added image #' + (images.length), newImage);
-        }
+        newImage.args.forEach(function(image) {
+            if (!this.imageExists(images, image)) {
+                images.splice(0, 0, callback.call(this, newImage));
+                log('Added image #' + (images.length), image);
+            }
+        }, this);
     };
 };
 
@@ -319,9 +325,11 @@ ImageLoader.prototype.hasImageBackground = function(imageData) {
 ImageLoader.prototype.loadImage = function(imageData) {
     if (imageData.method === "url") {
         var src = imageData.args[0];
-        if (src.match(/data:image\/.*;base64,/i)) {
+        if (this.isSVG(src) && !this.support.svg && !this.options.allowTaint) {
+            return new SVGContainer(src);
+        } else if (src.match(/data:image\/.*;base64,/i)) {
             return new ImageContainer(src.replace(/url\(['"]{0,}|['"]{0,}\)$/ig, ''), false);
-        } else if (this.isSameOrigin(src) || this.options.allowTaint === true) {
+        } else if (this.isSameOrigin(src) || this.options.allowTaint === true || this.isSVG(src)) {
             return new ImageContainer(src, false);
         } else if (this.support.cors && !this.options.allowTaint && this.options.useCORS) {
             return new ImageContainer(src, true);
@@ -334,9 +342,15 @@ ImageLoader.prototype.loadImage = function(imageData) {
         return new LinearGradientContainer(imageData);
     } else if (imageData.method === "gradient") {
         return new WebkitGradientContainer(imageData);
+    } else if (imageData.method === "svg") {
+        return new SVGNodeContainer(imageData.args[0]);
     } else {
         return new DummyImageContainer(imageData);
     }
+};
+
+ImageLoader.prototype.isSVG = function(src) {
+    return (/(.+).svg$/i.test(src)) || SVGContainer.prototype.isInline(src);
 };
 
 ImageLoader.prototype.imageExists = function(images, src) {
@@ -382,12 +396,24 @@ function isImage(container) {
     return container.node.nodeName === "IMG";
 }
 
+function isSVGNode(container) {
+    return container.node.nodeName === "svg";
+}
+
 function urlImage(container) {
     return {
         args: [container.node.src],
         method: "url"
     };
 }
+
+function svgImage(container) {
+    return {
+        args: [container.node],
+        method: "svg"
+    };
+}
+
 
 function LinearGradientContainer(imageData) {
     GradientContainer.apply(this, arguments);
@@ -831,14 +857,14 @@ function getBounds(node) {
     if (node.getBoundingClientRect) {
         var clientRect = node.getBoundingClientRect();
         var isBody = node.nodeName === "BODY";
-        var width = isBody ? node.scrollWidth : node.offsetWidth;
+        var width = isBody ? node.scrollWidth : (node.offsetWidth == null ? clientRect.width : node.offsetWidth);
         return {
             top: clientRect.top,
             bottom: clientRect.bottom || (clientRect.top + clientRect.height),
             right: clientRect.left + width,
             left: clientRect.left,
             width:  width,
-            height: isBody ? node.scrollHeight : node.offsetHeight
+            height: isBody ? node.scrollHeight : (node.offsetHeight == null ? clientRect.height : node.offsetHeight)
         };
     }
     return {};
@@ -1108,8 +1134,15 @@ NodeParser.prototype.paintNode = function(container) {
         this.renderer.renderBackground(container, bounds, borderData.borders.map(getWidth));
     }, this);
     this.renderer.renderBorders(borderData.borders);
-
     switch(container.node.nodeName) {
+        case "svg":
+            var svgContainer = this.images.get(container.node);
+            if (svgContainer) {
+                this.renderer.renderImage(container, bounds, borderData, svgContainer);
+            } else {
+                log("Error loading <svg>", container.node);
+            }
+            break;
         case "IMG":
             var imageContainer = this.images.get(container.node.src);
             if (imageContainer) {
@@ -1582,16 +1615,18 @@ Renderer.prototype.renderImage = function(container, bounds, borderData, imageCo
         paddingBottom = container.cssInt('paddingBottom'),
         borders = borderData.borders;
 
+    var width = bounds.width - (borders[1].width + borders[3].width + paddingLeft + paddingRight);
+    var height = bounds.height - (borders[0].width + borders[2].width + paddingTop + paddingBottom);
     this.drawImage(
         imageContainer,
         0,
         0,
-        imageContainer.image.width,
-        imageContainer.image.height,
+        imageContainer.image.width || width,
+        imageContainer.image.height || height,
         bounds.left + paddingLeft + borders[3].width,
         bounds.top + paddingTop + borders[0].width,
-        bounds.width - (borders[1].width + borders[3].width + paddingLeft + paddingRight),
-        bounds.height - (borders[0].width + borders[2].width + paddingTop + paddingBottom)
+        width,
+        height
     );
 };
 
@@ -1674,6 +1709,187 @@ Renderer.prototype.isTransparent = function(color) {
     return (!color || color === "transparent" || color === "rgba(0, 0, 0, 0)");
 };
 
+function StackingContext(hasOwnStacking, opacity, element, parent) {
+    NodeContainer.call(this, element, parent);
+    this.ownStacking = hasOwnStacking;
+    this.contexts = [];
+    this.children = [];
+    this.opacity = (this.parent ? this.parent.stack.opacity : 1) * opacity;
+}
+
+StackingContext.prototype = Object.create(NodeContainer.prototype);
+
+StackingContext.prototype.getParentStack = function(context) {
+    var parentStack = (this.parent) ? this.parent.stack : null;
+    return parentStack ? (parentStack.ownStacking ? parentStack : parentStack.getParentStack(context)) : context.stack;
+};
+
+function Support(document) {
+    this.rangeBounds = this.testRangeBounds(document);
+    this.cors = this.testCORS();
+    this.svg = this.testSVG();
+}
+
+Support.prototype.testRangeBounds = function(document) {
+    var range, testElement, rangeBounds, rangeHeight, support = false;
+
+    if (document.createRange) {
+        range = document.createRange();
+        if (range.getBoundingClientRect) {
+            testElement = document.createElement('boundtest');
+            testElement.style.height = "123px";
+            testElement.style.display = "block";
+            document.body.appendChild(testElement);
+
+            range.selectNode(testElement);
+            rangeBounds = range.getBoundingClientRect();
+            rangeHeight = rangeBounds.height;
+
+            if (rangeHeight === 123) {
+                support = true;
+            }
+            document.body.removeChild(testElement);
+        }
+    }
+
+    return support;
+};
+
+Support.prototype.testCORS = function() {
+    return typeof((new Image()).crossOrigin) !== "undefined";
+};
+
+Support.prototype.testSVG = function() {
+    var img = new Image();
+    var canvas = document.createElement("canvas");
+    var ctx =  canvas.getContext("2d");
+    img.src = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'></svg>";
+
+    try {
+        ctx.drawImage(img, 0, 0);
+        canvas.toDataURL();
+    } catch(e) {
+        return false;
+    }
+    return true;
+};
+
+function SVGContainer(src) {
+    this.src = src;
+    this.image = null;
+    var self = this;
+
+    this.promise = this.hasFabric().then(function() {
+        return (self.isInline(src) ? Promise.resolve(self.inlineFormatting(src)) : XHR(src));
+    }).then(function(svg) {
+        return new Promise(function(resolve) {
+            html2canvas.fabric.loadSVGFromString(svg, self.createCanvas.call(self, resolve));
+        });
+    });
+}
+
+SVGContainer.prototype.hasFabric = function() {
+    return !html2canvas.fabric ? Promise.reject(new Error("html2canvas.svg.js is not loaded, cannot render svg")) : Promise.resolve();
+};
+
+SVGContainer.prototype.inlineFormatting = function(src) {
+    return (/^data:image\/svg\+xml;base64,/.test(src)) ? window.atob(this.removeContentType(src)) : this.removeContentType(src);
+};
+
+SVGContainer.prototype.removeContentType = function(src) {
+    return src.replace(/^data:image\/svg\+xml(;base64)?,/,'');
+};
+
+SVGContainer.prototype.isInline = function(src) {
+    return (/^data:image\/svg\+xml/i.test(src));
+};
+
+SVGContainer.prototype.createCanvas = function(resolve) {
+    var self = this;
+    return function (objects, options) {
+        var canvas = new html2canvas.fabric.StaticCanvas('c');
+        self.image = canvas.lowerCanvasEl;
+        canvas
+            .setWidth(options.width)
+            .setHeight(options.height)
+            .add(html2canvas.fabric.util.groupSVGElements(objects, options))
+            .renderAll();
+        resolve(canvas.lowerCanvasEl);
+    };
+};
+
+function SVGNodeContainer(node) {
+    this.src = node;
+    this.image = null;
+    var self = this;
+
+    this.promise = this.hasFabric().then(function() {
+        return new Promise(function(resolve) {
+            html2canvas.fabric.parseSVGDocument(node, self.createCanvas.call(self, resolve));
+        });
+    });
+}
+
+SVGNodeContainer.prototype = Object.create(SVGContainer.prototype);
+
+function TextContainer(node, parent) {
+    NodeContainer.call(this, node, parent);
+}
+
+TextContainer.prototype = Object.create(NodeContainer.prototype);
+
+TextContainer.prototype.applyTextTransform = function() {
+    this.node.data = this.transform(this.parent.css("textTransform"));
+};
+
+TextContainer.prototype.transform = function(transform) {
+    var text = this.node.data;
+    switch(transform){
+        case "lowercase":
+            return text.toLowerCase();
+        case "capitalize":
+            return text.replace(/(^|\s|:|-|\(|\))([a-z])/g, capitalize);
+        case "uppercase":
+            return text.toUpperCase();
+        default:
+            return text;
+    }
+};
+
+function capitalize(m, p1, p2) {
+    if (m.length > 0) {
+        return p1 + p2.toUpperCase();
+    }
+}
+
+function WebkitGradientContainer(imageData) {
+    GradientContainer.apply(this, arguments);
+    this.type = (imageData.args[0] === "linear") ? this.TYPES.LINEAR : this.TYPES.RADIAL;
+}
+
+WebkitGradientContainer.prototype = Object.create(GradientContainer.prototype);
+
+function XHR(url) {
+    return new Promise(function(resolve, reject) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', url);
+
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                resolve(xhr.responseText);
+            } else {
+                reject(new Error(xhr.statusText));
+            }
+        };
+
+        xhr.onerror = function() {
+            reject(new Error("Network Error"));
+        };
+
+        xhr.send();
+    });
+}
+
 function CanvasRenderer(width, height) {
     Renderer.apply(this, arguments);
     this.canvas = document.createElement("canvas");
@@ -1718,7 +1934,7 @@ CanvasRenderer.prototype.taints = function(imageContainer) {
 };
 
 CanvasRenderer.prototype.drawImage = function(imageContainer, sx, sy, sw, sh, dx, dy, dw, dh) {
-    if (!this.taints(imageContainer)) {
+    if (!this.taints(imageContainer) || this.options.allowTaint) {
         this.ctx.drawImage(imageContainer.image, sx, sy, sw, sh, dx, dy, dw, dh);
     }
 };
@@ -1824,90 +2040,4 @@ CanvasRenderer.prototype.resizeImage = function(imageContainer, size) {
     return canvas;
 };
 
-function StackingContext(hasOwnStacking, opacity, element, parent) {
-    NodeContainer.call(this, element, parent);
-    this.ownStacking = hasOwnStacking;
-    this.contexts = [];
-    this.children = [];
-    this.opacity = (this.parent ? this.parent.stack.opacity : 1) * opacity;
-}
-
-StackingContext.prototype = Object.create(NodeContainer.prototype);
-
-StackingContext.prototype.getParentStack = function(context) {
-    var parentStack = (this.parent) ? this.parent.stack : null;
-    return parentStack ? (parentStack.ownStacking ? parentStack : parentStack.getParentStack(context)) : context.stack;
-};
-
-function Support(document) {
-    this.rangeBounds = this.testRangeBounds(document);
-    this.cors = this.testCORS();
-}
-
-Support.prototype.testRangeBounds = function(document) {
-    var range, testElement, rangeBounds, rangeHeight, support = false;
-
-    if (document.createRange) {
-        range = document.createRange();
-        if (range.getBoundingClientRect) {
-            testElement = document.createElement('boundtest');
-            testElement.style.height = "123px";
-            testElement.style.display = "block";
-            document.body.appendChild(testElement);
-
-            range.selectNode(testElement);
-            rangeBounds = range.getBoundingClientRect();
-            rangeHeight = rangeBounds.height;
-
-            if (rangeHeight === 123) {
-                support = true;
-            }
-            document.body.removeChild(testElement);
-        }
-    }
-
-    return support;
-};
-
-Support.prototype.testCORS = function() {
-    return typeof((new Image()).crossOrigin) !== "undefined";
-};
-
-function TextContainer(node, parent) {
-    NodeContainer.call(this, node, parent);
-}
-
-TextContainer.prototype = Object.create(NodeContainer.prototype);
-
-TextContainer.prototype.applyTextTransform = function() {
-    this.node.data = this.transform(this.parent.css("textTransform"));
-};
-
-TextContainer.prototype.transform = function(transform) {
-    var text = this.node.data;
-    switch(transform){
-        case "lowercase":
-            return text.toLowerCase();
-        case "capitalize":
-            return text.replace(/(^|\s|:|-|\(|\))([a-z])/g, capitalize);
-        case "uppercase":
-            return text.toUpperCase();
-        default:
-            return text;
-    }
-};
-
-function capitalize(m, p1, p2) {
-    if (m.length > 0) {
-        return p1 + p2.toUpperCase();
-    }
-}
-
-function WebkitGradientContainer(imageData) {
-    GradientContainer.apply(this, arguments);
-    this.type = (imageData.args[0] === "linear") ? this.TYPES.LINEAR : this.TYPES.RADIAL;
-}
-
-WebkitGradientContainer.prototype = Object.create(GradientContainer.prototype);
-
-})(window,document);
+})(window, document);

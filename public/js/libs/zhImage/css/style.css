@@ -10,6 +10,10 @@
 	display: none;
 }
 
+.show {
+	display: block;
+}
+
 .zuImage {
 	background: #FFFFFF;
 	-webkit-border-radius: 8px;
@@ -27,7 +31,7 @@
 .zu-table {
 	display: table;
 	width: 100%;
-	height: 46px;
+	height: 50px;
 	background: url(../images/opacity.png);
 	float: left;
 	padding: 2px 17px 2px 17px;
@@ -195,6 +199,7 @@
 	top: -100px;
 	background: url(../images/opacity.png);
 	z-index: 98;
+	display: none;
 }
 
 .zu-table-row {
@@ -263,8 +268,8 @@
 }
 
 .zu-end {
-	width: 170px;
-	height: 60px;
+	width: 205px;
+	height: 80px;
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -279,6 +284,21 @@
 .zu-end li {
 	float: left;
 	margin-right: 50px;
+	-webkit-border-radius: 40px;
+	-moz-border-radius: 40px;
+	border-radius: 40px;
+	border: 1px solid #CCCCCC;
+	overflow: hidden;
+	width: 75px;
+	height: 75px;
+	padding: 15px 0px 0px 16px;
+	color: #50754D;
+}
+
+.zu-end li:hover {
+	background: #CCCCCC;
+	color: #FFFFFF;
+	cursor: pointer;
 }
 
 .zu-end li:last-child {
@@ -290,14 +310,24 @@
 }
 
 .s58 {
-	font-size: 58px;
-	color: #50754D;
+	font-size: 44px;
 }
 
 .current_light {
 	animation: shiny 5s;
   	-moz-animation: shiny 5s infinite;
 	-webkit-animation: shiny 5s infinite;
+}
+
+.takephoto_msg {
+	position: absolute;
+	top: 63px;
+	left: 12px;
+	font-size: 15px;
+	padding: 6px;
+	cursor: pointer;
+	background: url(../images/opacity.png);
+	display: none;
 }
 
 @-moz-keyframes shiny {

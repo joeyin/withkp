@@ -8,15 +8,18 @@
     		$window = $(window),
     		stepNum = 0,
     		select_photo = null,
+    		takephoto_msg = null,
+    		zu_prompt1 = null,
     		progressUpdate = function(num) {
     			var takephoto = $(".zu-tool ul li:eq(0) span");
     			if(num === 1 ){
     				updateStyle.progress(1);
-		           	$(".zu-select-photo").animate({
-						'top': 46
+		           	$(".zu-select-photo").show().animate({
+						'top': 50
 		           	}, 600);
 		           	progressUpdate(2);
 		           	takephoto.removeClass('current_light');
+		           	takephoto_msg.add(zu_prompt1).removeClass('show');
     			}else if(num === 2){
     				updateStyle.progress(1);
     				$(".zu-select-photo ul li").click(function(){
@@ -24,19 +27,29 @@
 		           		$(".zu-select-photo").animate({
 							'top': -100
 			            }, 600, function(){
+			            	$(this).hide();
 			            	progressUpdate(3);
 			            });
 		           	});
 		           	takephoto.removeClass('current_light');
+		           	takephoto_msg.add(zu_prompt1).removeClass('show');
 				}else if(num === 3 ){
+					takephoto_msg.addClass('show');
 					updateStyle.progress(2);
 					var image_src = $('.zu-select-photo ul li:eq('+select_photo+')').css('backgroundImage').replace('url(','').replace(')','').replace('"','');
 					$(".zu_roles").html('<img width="80%" src="'+image_src+'" />').draggable({'cursor': 'move', 'scroll': false });
 					$(".zu_roles img").resizable({ handles: "n, e, s, w" });
 					takephoto.addClass('current_light');
+					zu_prompt1.removeClass('show');
 				}else{
 					updateStyle.progress(0);
 					takephoto.removeClass('current_light');
+					takephoto_msg.removeClass('show');
+					$(".zu_step1_workspace_img").css('backgroundImage', '');
+					takephoto.removeClass('current_light');
+		           	takephoto_msg.removeClass('show');
+		           	zu_prompt1.addClass('show');
+		           	$(".zu_roles").empty();
 				}
     		},
     		updateStyle = {
@@ -47,38 +60,49 @@
     			}
     		},
     		initWorkSpace = function(){
-    			progressUpdate(0);
     			$("body").append('<div class="zu-light"></div>');
 	    		$(".zu-light").css('height', $('body').height());
     			$this.css({
 		    		'width': obj.width,
 		    		'maxWidth': obj.maxwidth,
 		    		'height': obj.height,
-		    	}).html('<input name="upload_img" class="hidden" type="file" /><div class="zu_prompt1"><div class="zu_prompt_middle"><div class="zu_step1_prompt_text"></div><div class="zu_step1_prompt_img"></div></div></div><div class="zu_workspace"><div class="zu_step1_workspace_block"></div><div class="zu_step1_workspace_img"></div><div class="zu_roles"></div></div><div class="abs_2"><div class="zu-table"><div class="zu-table-row"><div class="zu-tool"><ul><li><span class="glyphicon glyphicon-camera gray s20"></span></li><li><span class="glyphicon glyphicon-picture green s20"></span></li></ul></div><div class="zu-progresstext"><ul><li><div class="step1"></div></li><li><div class="step2"></div></li><li><div class="step3"></div></li><li><div class="step4"></div></li></ul></div></div></div><div class="zu-select-photo"><ul></ul></div></div>');
+		    	}).html('<input name="upload_img" class="hidden" type="file" /><div class="zu_prompt1"><div class="zu_prompt_middle"><div class="zu_step1_prompt_text"></div><div class="zu_step1_prompt_img"></div></div></div><div class="zu_workspace"><div class="zu_step1_workspace_block"></div><div class="zu_step1_workspace_img"></div><div class="zu_roles"></div></div><div class="abs_2"><div class="takephoto_msg">立即合照</div><div class="zu-table"><div class="zu-table-row"><div class="zu-tool"><ul><li><span class="glyphicon glyphicon-camera gray s20"></span></li><li><span class="glyphicon glyphicon-picture green s20"></span></li></ul></div><div class="zu-progresstext"><ul><li><div class="step1"></div></li><li><div class="step2"></div></li><li><div class="step3"></div></li><li><div class="step4"></div></li></ul></div></div></div><div class="zu-select-photo"><ul></ul></div></div>');
 				$.each(obj.photo, function( index, value ) {
 					$(".zu-select-photo ul").append('<li style="background:url('+value+') bottom center no-repeat;background-size:100%;"></li>');
 				});
 				$(".zu_prompt1, .zu-tool ul li:eq(1)").click(function() {
 		    		$("input[name='upload_img']").trigger('click');
-		    		$(".zu_roles").empty();
+		    		if($(".zu-select-photo").is(':visible')){
+		           		$(".zu-select-photo").animate({
+							'top': -100
+			            }, 600, function(){
+			            	$(this).hide();
+			            });
+		    		}
 		    	});
 		    	$("input[name='upload_img']").change(function() {
-		    		var fileInput = $(this)[0],
-		    			file = fileInput.files[0],
-		    			reader = new FileReader();
-				    reader.onload = function(e) {
-						try {
-							localStorage.theImage = reader.result;
-				           	$(".zu_step1_workspace_img").css('background', 'url('+reader.result+')');
-				           	$(".zu_prompt1").hide();
-				           	progressUpdate(1);
-			           	}catch(e){
-			           		alert('發生錯誤： '+e);
-			           	}
-				    }
-				    reader.readAsDataURL(file);
+		    		if($(this).val()){
+		    			var fileInput = $(this)[0],
+			    			file = fileInput.files[0],
+			    			reader = new FileReader();
+					    reader.onload = function(e) {
+							try {
+								localStorage.theImage = reader.result;
+					           	$(".zu_step1_workspace_img").css('background', 'url('+reader.result+')');
+					           	$(".zu_prompt1").hide();
+					           	progressUpdate(1);
+				           	}catch(e){
+				           		alert('發生錯誤： '+e);
+				           	}
+					    }
+					    reader.readAsDataURL(file);
+		    		}else{
+		    			progressUpdate(0);
+		    		}
 		    	});
-		    	$(".zu-tool ul li:eq(0), .step4").click(function(){
+		    	takephoto_msg = $(".takephoto_msg");
+		    	zu_prompt1 = $(".zu_prompt1");
+		    	$(".zu-tool ul li:eq(0), .step4").add(takephoto_msg).click(function(){
 		    		if(stepNum === 2){
 		    			$(".ui-resizable-handle").hide();
 		    			updateStyle.progress(3);
@@ -102,7 +126,6 @@
 							    	}catch(e){
 							    		alert(e);
 							    	}
-							    	
 							  	}
 							});
 			            });
@@ -110,6 +133,7 @@
 		    			return;
 		    		}
 		    	});
+				progressUpdate(0);
     		};
 
     	$window.on('load', initWorkSpace);

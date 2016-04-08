@@ -160,10 +160,11 @@
 }
 
 .zu_step1_prompt_text {
-	background: url(../images/text.png) no-repeat -270px -1px;
-	width: 630px;
-	height: 100px;
-	margin: 0px auto 38px auto;
+	background: url(../images/upload-text.png) no-repeat;
+    width: 70%;
+    height: 100px;
+    margin: 0px auto 38px auto;
+    background-size: 100%;
 }
 
 .zu_step1_prompt_img {
